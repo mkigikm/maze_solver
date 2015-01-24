@@ -8,17 +8,14 @@ class MazeConsole
   DEFAULT_FILE = "maze1.txt"
 
   def initialize(maze)
-    @maze = maze
-    @maze_solution = maze.solve
+    @player = LostInMaze.new(maze)
   end
 
   def draw(show_solution)
-    maze = show_solution ? @maze_solution : @maze
-    [maze.to_s, CONTROLS].join("\n")
+    [@player.display(show_solution), CONTROLS].join("\n")
   end
 
   def run
-    positition = @maze.start
     show_solution = false
 
     Dispel::Screen.open do |screen|
@@ -28,19 +25,12 @@ class MazeConsole
         case key
         when "q" then break
         when "s" then show_solution = !show_solution
-        when :left
-          @maze.player_left
-          @maze_solution.player_left
-        when :right
-          @maze.player_right
-          @maze_solution.player_right
-        when :up
-          @maze.player_up
-          @maze_solution.player_up
-        when :down
-          @maze.player_down
-          @maze_solution.player_down
+        when :left then @player.left
+        when :right then @player.right
+        when :up then @player.up
+        when :down then @player.down
         end
+
         screen.draw draw(show_solution)
       end
     end

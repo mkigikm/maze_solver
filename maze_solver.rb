@@ -1,11 +1,55 @@
+class LostInMaze
+  def initialize(maze)
+    @maze = maze
+    @solution = maze.solve
+    @pos = maze.start
+  end
+
+  def up
+    move(Maze::UP)
+  end
+
+  def down
+    move(Maze::DOWN)
+  end
+
+  def left
+    move(Maze::LEFT)
+  end
+
+  def right
+    move(Maze::RIGHT)
+  end
+
+  def move(delta)
+    new_pos = Maze.pos_add(@pos, delta)
+    @pos = new_pos if @maze[new_pos] != :wall
+  end
+
+  def display(show_solution)
+    rows, cols = @maze.dimensions
+    display_maze = show_solution ? @solution : @maze
+
+    rows.times.collect do |row|
+      cols.times.collect do |col|
+        pos = [row, col]
+        if pos == @pos
+          '@'
+        else
+          Maze::FILE_TO_SYMBOLS.invert[display_maze[pos]]
+        end
+      end.join
+    end.join("\n")
+  end
+end
+
 class Maze
   FILE_TO_SYMBOLS = {
     "*" => :wall,
     " " => :free,
     "S" => :start,
     "E" => :finish,
-    "#" => :solution,
-    "@" => :player
+    "#" => :solution
   }
 
   UP    = [-1,  0]
@@ -22,8 +66,6 @@ class Maze
         FILE_TO_SYMBOLS[square]
       end
     end
-
-    @player_position = start
 
     self
   end
@@ -44,25 +86,22 @@ class Maze
     Maze.new.load_file(filename)
   end
 
-  def initialize(board=nil, player_position=nil)
+  def self.pos_add(pos, delta)
+    [pos.first + delta.first, pos.last + delta.last]
+  end
+
+  def initialize(board=nil)
     unless board.nil?
       @maze_board = board.map { |row| row.dup }
-      @player_position = player_position.nil? ? start : player_position.dup
     end
   end
 
   def to_s
-    old_symbol = self[@player_position]
-    self[@player_position] = :player
-
     board = @maze_board.map do |line|
       line.map do |square|
         FILE_TO_SYMBOLS.invert[square]
       end.join
     end.join("\n")
-
-    self[@player_position] = old_symbol
-    board
   end
 
   def start
@@ -106,23 +145,7 @@ class Maze
   end
 
   def dup
-    Maze.new(@maze_board, @player_position)
-  end
-
-  def player_up
-    player_move(UP)
-  end
-
-  def player_down
-    player_move(DOWN)
-  end
-
-  def player_left
-    player_move(LEFT)
-  end
-
-  def player_right
-    player_move(RIGHT)
+    Maze.new(@maze_board)
   end
 
   private
@@ -137,23 +160,14 @@ class Maze
     nil
   end
 
-  def player_move(delta)
-    new_pos = pos_add(@player_position, delta)
-    @player_position = new_pos if self[new_pos] != :wall
-  end
-
   def free_neighbors(pos)
     neighbors(pos).reject { |square| self[square] == :wall }
   end
 
   def neighbors(pos)
     DELTAS.map do |delta|
-      new_pos = pos_add(pos, delta)
+      new_pos = Maze.pos_add(pos, delta)
     end
-  end
-
-  def pos_add(pos, delta)
-    [pos.first + delta.first, pos.last + delta.last]
   end
 
   def find_path(came_from)

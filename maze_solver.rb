@@ -49,10 +49,6 @@ class Maze
     end.join("\n")
   end
 
-  def inspect
-    "<Maze:#{__id__} @maze_board:#{@maze_board.__id__}>"
-  end
-
   def start
     find_symbol(:start)
   end

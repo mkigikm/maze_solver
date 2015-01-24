@@ -51,6 +51,22 @@ class Maze
   RIGHT = [ 0,  1]
   DELTAS = [UP, DOWN, LEFT, RIGHT]
 
+  def self.generate(rows, columns)
+    maze_board = Array.new(rows) { [:wall] * columns }
+    maze = Maze.new(maze_board)
+
+    maze.construct([1, 1])
+    maze
+  end
+
+  def construct(pos)
+    self[pos] = :free
+
+    neighbors(pos).shuffle.each do |next_pos|
+      construct(next_pos) if constructable(pos, next_pos)
+    end
+  end
+
   def load_file(filename)
     maze_lines = File.readlines(filename).map(&:chomp)
 
@@ -174,5 +190,15 @@ class Maze
         current_pos = came_from[current_pos]
       end
     end
+  end
+
+  def edge?(pos)
+    pos.include?(0) || pos.first == @maze_board.count - 1 ||
+      pos.last == @maze_board[0].count - 1
+  end
+
+  def constructable(pos, next_pos)
+    !edge?(next_pos) &&
+      neighbors(next_pos).one? { |n| self[n] != :wall }
   end
 end

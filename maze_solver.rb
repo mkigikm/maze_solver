@@ -30,16 +30,9 @@ class LostInMaze
     rows, cols = @maze.dimensions
     display_maze = show_solution ? @solution : @maze
 
-    rows.times.collect do |row|
-      cols.times.collect do |col|
-        pos = [row, col]
-        if pos == @pos
-          '@'
-        else
-          Maze::FILE_TO_SYMBOLS.invert[display_maze[pos]]
-        end
-      end.join
-    end.join("\n")
+    strs = display_maze.to_s.split("\n")
+    strs[@pos.first][@pos.last] = "@"
+    strs.join("\n")
   end
 end
 

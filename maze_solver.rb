@@ -1,4 +1,6 @@
 class LostInMaze
+  attr_reader :pos
+
   def initialize(maze)
     @maze = maze
     @solution = maze.solve
@@ -22,7 +24,7 @@ class LostInMaze
   end
 
   def move(delta)
-    new_pos = Maze.pos_add(@pos, delta)
+    new_pos = Maze.pos_add(pos, delta)
     @pos = new_pos if @maze[new_pos] != :wall
   end
 
@@ -31,7 +33,7 @@ class LostInMaze
     display_maze = show_solution ? @solution : @maze
 
     strs = display_maze.to_s.split("\n")
-    strs[@pos.first][@pos.last] = "@"
+    strs[pos.first][pos.last] = "@"
     strs.join("\n")
   end
 end

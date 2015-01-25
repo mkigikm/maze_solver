@@ -19,7 +19,7 @@ class MazeConsole
     show_solution = false
 
     Dispel::Screen.open do |screen|
-      screen.draw draw(show_solution)
+      screen.draw(draw(show_solution), [], @player.pos)
 
       Dispel::Keyboard.output do |key|
         case key
@@ -31,7 +31,7 @@ class MazeConsole
         when :down then @player.down
         end
 
-        screen.draw draw(show_solution)
+        screen.draw(draw(show_solution), [], @player.pos)
       end
     end
   end
